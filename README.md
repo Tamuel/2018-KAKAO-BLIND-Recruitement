@@ -10,3 +10,6 @@ My source code for 2018 KAKAO BLIND test.
 * 1차 테스트 주소 : http://tech.kakao.com/2017/09/27/kakao-blind-recruitment-round-1/
 
 * 3차 테스트 주소 : http://tech.kakao.com/2017/11/14/kakao-blind-recruitment-round-3/
+
+---
+* 이메일 : eastern7star@gmail.com
