@@ -1,90 +1,70 @@
 #include <iostream>
-#include <string>
-#include <vector>
 #include <map>
-#include <deque>
+#include <string>
 #include <algorithm>
-#include <functional>
-#include <iomanip>
 
 using namespace std;
 
-// 2018 1st 5hour
-// 5. 뉴스 클러스터링
-map<string, int> divide_string(string str, int sub_size) {
-	map<string, int> division;
-	for (int i = 0; i < str.size() - 1; i++) {
-		string substring = str.substr(i, sub_size);
-		bool check_str = true;
-		for (int j = 0; j < sub_size; j++) {
-			bool check_upper = substring[j] >= 'A' && substring[j] <= 'Z';
-			bool check_lower = substring[j] >= 'a' && substring[j] <= 'z';
-			if (!(check_upper || check_lower)) {
-				check_str = false;
-				break;
-			}
-			if (check_upper)
-				substring[j] -= int('A' - 'a');
-		}
-		if (check_str && !division.insert(pair<string, int>(substring, 1)).second)
-			division[substring]++;
-	}
-
-	return division;
+void tolower(string& str) {
+	for (int i = 0; i < str.length(); i++)
+		if (str[i] <= 'Z' && str[i] >= 'A') str[i] += 'a' - 'A';
 }
-int news_clustering() {
-	string str1 = "E=M*C^2";
-	string str2 = "e=m*c^2";
 
-	int sub_size = 2;
+void makeStrMap(string& str, map<string, int>& strMap) {
+	for (int i = 0; i < str.size() - 1; i++) {
+		if (str[i] >= 'a' && str[i] <= 'z' && str[i + 1] >= 'a' && str[i + 1] <= 'z')
+			if (!strMap.insert({ str.substr(i, 2), 1 }).second)
+				strMap[str.substr(i, 2)]++;
+	}
+}
 
-	map<string, int> merge1, merge2;
+int main() {
+	string str1;
+	string str2;
 
-	merge1 = divide_string(str1, sub_size);
-	merge2 = divide_string(str2, sub_size);
+	getline(cin, str1);
+	getline(cin, str2);
 
-	if (merge1.size() == 0 && merge2.size() == 0)
-		return 1;
+	tolower(str1);
+	tolower(str2);
+
+	map<string, int> strMap1, strMap2;
+
+	makeStrMap(str1, strMap1);
+	makeStrMap(str2, strMap2);
+
+	if (strMap1.size() == 0 && strMap2.size() == 0) {
+		cout << 65536 << endl;
+		return 0;
+	}
 	
-	int inter = 0, uni = 0, comparison;
-	map<string, int>::iterator i = merge1.begin(), j = merge2.begin();
-	while (true) {
-		if (i == merge1.end() && j == merge2.end())
-			break;
+	float uni = 0, inter = 0;
+	map<string, int>::iterator iter1 = strMap1.begin(), iter2 = strMap2.begin();
 
-		if (i == merge1.end()) {
-			uni += j->second;
-			j++;
+	while (iter1 != strMap1.end() && iter2 != strMap2.end()) {
+		if (iter1->first == iter2->first) {
+			uni += max(iter1->second, iter2->second);
+			inter += min(iter1->second, iter2->second);
+			iter1++; iter2++;
 		}
-		else if (j == merge2.end()) {
-			uni += i->second;
-			i++;
+		else if (iter1->first > iter2->first) {
+			uni += iter2->second;
+			iter2++;
 		}
 		else {
-			comparison = i->first.compare(j->first);
-			if (comparison == 0) {
-				inter += i->second < j->second ? i->second : j->second;
-				uni += i->second > j->second ? i->second : j->second;
-				i++;
-				j++;
-			}
-			else if (comparison < 0) {
-				uni += i->second;
-				i++;
-			}
-			else if (comparison > 0) {
-				uni += j->second;
-				j++;
-			}
+			uni += iter1->second;
+			iter1++;
 		}
 	}
-	
+	if (iter1 != strMap1.end())
+		while (iter1 != strMap1.end()) uni += (iter1++)->second;
+	if (iter2 != strMap2.end())
+		while (iter2 != strMap2.end()) uni += (iter2++)->second;
 
-	int result = int(65536 * inter / uni);
-	cout << result << endl;
-	return result;
+	cout << int((inter / uni) * 65536) << endl;
+
+	return 0;
 }
-
 
 int main() {
 	news_clustering();
