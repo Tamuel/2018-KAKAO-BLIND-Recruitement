@@ -65,9 +65,3 @@ int main() {
 
 	return 0;
 }
-
-int main() {
-	news_clustering();
-
-	return 0;
-}
