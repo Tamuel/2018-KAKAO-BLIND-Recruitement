@@ -1,71 +1,44 @@
 #include <iostream>
 #include <string>
-#include <vector>
-#include <map>
-#include <deque>
-#include <algorithm>
-#include <functional>
-#include <iomanip>
 
 using namespace std;
 
-// 2018 1st 5hour
-// 2018 3rd 4hour
-// 1. NÁø¼ö °ÔÀÓ
-string encode(int decimal, int factor) {
-	if (decimal == 0)
-		return "0";
-
+string changeNumber(int num, int k) {
+	if (num == 0) return "0";
 	string output = "";
-
-	int current = decimal, remain;
-	while (true) {
-		if (current == 0)
-			break;
-		int temp = current % factor;
-		char t = temp + '0';
-		if (temp >= 10)
-			t = (temp - 10) + 'A';
-
-		output += t;
-		current = int(current / factor);
+	
+	while (num >= 1) {
+		if (num % k < 10) output += (num % k) + '0';
+		else output += (num % k - 10) + 'A';
+		num /= k;
 	}
-
-	string result;
+	string reverse;
 	for (int i = output.size() - 1; i >= 0; i--)
-		result += output[i];
+		reverse += output[i];
 
-	return result;
+	return reverse;
 }
-void n_factor() {
-	// n Áø¹ı, m »ç¶÷ ¼ö, t ¾Æ¿ôÇ² °¹¼ö, p Æ©ºê ÀÚ¸®
-	int n = 16, t = 16, m = 2, p = 1;
-	vector<char> output;
 
-	int index = 0;
+int main() {
+	int n, t, m, p;
+
+	cin >> n >> t >> m >> p;
+	p--;
 	int current = 0;
-	while (true) {
-		string str = encode(current, n);
-		
-		for (int i = 0; i < str.size(); i++) {
-			if (index % m == p - 1) {
-				output.push_back(str[i]);
-				if (output.size() == t)
-					break;
-			}
-			index++;
-		}
-		if (output.size() == t)
-			break;
-
-		current++;
+	int count = 0;
+	string results = "";
+	while (results.length() < t) {
+		string toNum = changeNumber(current++, n);
+		for (int i = 0; i < toNum.size(); i++)
+			if ((i + count) % m == p && results.length() < t) results += toNum[i];
+		count += toNum.size();
 	}
 
-	for (int i = 0; i < output.size(); i++)
-		cout << output[i];
+	cout << results << endl;
 
-	cout << endl;
+	return 0;
 }
+
 
 int main() {
 	n_factor();
