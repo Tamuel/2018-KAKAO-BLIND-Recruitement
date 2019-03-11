@@ -10,49 +10,49 @@
 using namespace std;
 
 // 2018 1st 5hour
-// 4. ¼ÅÆ²¹ö½º
+// 4. Â¼Ã…Ã†Â²Â¹Ã¶Â½Âº
 void shuttle_bus() {
-	int n = 10, t = 60, m = 45;
-	vector<string> timetable = {
-		"23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59"
-	};
-	map<int, int> timetable_map; // [value, number of value]
+	int N;
+	int n, t, m;
+	map<int, int> timetable;
 
-	for (int i = 0; i < timetable.size(); i++) {
-		int time = stoi(timetable[i].substr(0, 2)) * 60 + stoi(timetable[i].substr(3, 2));
-		if (!timetable_map.insert(pair<int, int>(time, 1)).second)
-			timetable_map[time]++;
+	cin >> N >> n >> t >> m;
+	for (int i = 0; i < N; i++) {
+		string temp;
+		cin >> temp;
+		
+		int hour = stoi(temp.substr(0, 2));
+		int minute = stoi(temp.substr(3, 2));
+
+		if (!timetable.insert({ hour * 60 + minute, 1 }).second)
+			timetable[hour * 60 + minute]++;
 	}
 
+	map<int, int>::iterator iter;
 	int last = 0;
-	map<int, int>::iterator j = timetable_map.begin();
 	for (int i = 0; i < n; i++) {
-		int end = 540 + i * t;
-		int c_m = m;
-		while (j != timetable_map.end()) {
-			if (j->first <= end) {
-				if (j->second > c_m) {
-					j->second -= c_m;
-					c_m = 0;
-					last = j->first - 1;
-					break;
-				}
-				else {
-					c_m -= j->second;
-					if (c_m > 0)
-						last = j->first;
-					else
-						last = j->first - 1;
-					j = timetable_map.erase(j);
-				}
+		int current = 9 * 60 + i * t;
+		int cM = m;
+		iter = timetable.begin();
+		for (; iter != timetable.end() && cM > 0 && iter->first <= current;) {
+			if (iter->second < cM) {
+				last = iter->first;
+				cM -= iter->second;
+				iter = timetable.erase(iter);
 			}
-			else break;
+			else {
+				last = iter->first - 1;
+				cM -= iter->second;
+				if (cM == 0) iter = timetable.erase(iter);
+			}
 		}
-		if (c_m > 0)
-			last = end;
-
-		cout << setw(2) << setfill('0') << (int)(last / 60) << ":" << setw(2) << setfill('0') << last % 60 << endl;
+		if (cM > 0) last = current;
 	}
+	
+	int hour = last / 60;
+	int minute = last % 60;
+	cout << (hour >= 10 ? to_string(hour) : "0" + to_string(hour)) << ":"
+		<< (minute >= 10 ? to_string(minute) : "0" + to_string(minute)) << endl;
 }
 
 
