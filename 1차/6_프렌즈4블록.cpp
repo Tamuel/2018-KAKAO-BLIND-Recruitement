@@ -66,9 +66,3 @@ int main() {
 
 	return 0;
 }
-
-int main() {
-	friends4block();
-
-	return 0;
-}
