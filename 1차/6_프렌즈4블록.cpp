@@ -1,105 +1,71 @@
 #include <iostream>
-#include <string>
 #include <vector>
-#include <map>
-#include <deque>
-#include <algorithm>
-#include <functional>
-#include <iomanip>
+#include <string>
+#define _x first
+#define _y second
 
 using namespace std;
 
-// 2018 1st 5hour
-// 6. «¡∑ª¡Ó4∫Ì∑œ
-int friends4block() {
-	int m = 6, n = 6;
-	vector<string> board = {
-		"TTTANT",
-		"RRFACC",
-		"RRRFCC",
-		"TRRRAA",
-		"TTMMMF",
-		"TMMTTJ"
-	};
-	vector<vector<int>> neighbor = {
-		{0, 1},
-		{1, 0},
-		{1, 1}
-	};
+int main() {
+	int m, n;
+	vector<string> board;
+	vector<pair<int, int>> offsets = { {0, 1}, {1, 0}, {1, 1} };
 
-	int count = 0;
-
-	while (true) {
-		cout << "===================" << endl;
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				cout << board[i][j];
-			}
-			cout << endl;
-		}
-
-		// Check blocks
-		vector<vector<int>> check(m, vector<int>(n, 0));
+	cin >> m >> n;
+	board.resize(m);
+	for (int i = 0; i < m; i++)
+		cin >> board[i];
+	
+	bool stop = false;
+	int nBreaks = 0;
+	while (!stop) {
+		vector<vector<int>> checker(m, vector<int>(n));
+		stop = true;
+		// Break
 		for (int i = 0; i < m - 1; i++) {
 			for (int j = 0; j < n - 1; j++) {
-				int basis = board[i][j];
-				if (basis == ' ')
-					continue;
-				bool broken = true;
-				vector<vector<int>>::iterator n;
-				for (n = neighbor.begin(); n != neighbor.end(); n++) {
-					if (board[i + (*n)[0]][j + (*n)[1]] != basis) {
-						broken = false;
-						break;
+				if (board[i][j] != ' ') {
+					bool check = true;
+					char current = board[i][j];
+					for (auto o : offsets)
+						if (current != board[i + o._y][j + o._x]) {
+							check = false;
+							break;
+						}
+
+					if (check) {
+						stop = false;
+						checker[i][j] = 1;
+						for (auto o : offsets)
+							checker[i + o._y][j + o._x] = 1;
 					}
-				}
-				if (broken) {
-					check[i][j] = 1;
-					for (n = neighbor.begin(); n != neighbor.end(); n++)
-						check[i + (*n)[0]][j + (*n)[1]] = 1;
 				}
 			}
 		}
-
-		int t_count = 0;
-		// Calculate count
 		for (int i = 0; i < m; i++)
 			for (int j = 0; j < n; j++)
-				if (check[i][j] == 1)
-					t_count++;
-		if (t_count == 0)
-			break;
-		else
-			count += t_count;
-
-		// Drop blocks
-		for (int j = 0; j < n; j++) {
-			for (int i = m - 1, k = m - 1; i >= 0;) {
-				if (check[i][j] == 1) {
-					k--;
-					if (k < 0) {
-						board[i][j] = ' ';
-						i--;
-					}
-					else if (check[k][j] == 0) {
-						board[i][j] = board[k][j];
-						board[k][j] = ' ';
-						check[k][j] = 1;
-						i--;
-					}
+				if (checker[i][j] == 1) {
+					nBreaks++;
+					board[i][j] = ' ';
 				}
-				else {
-					i--;
-					k--;
+
+		// Down
+		for (int i = m - 2; i >= 0; i--) {
+			for (int j = 0; j < n; j++) {
+				if (board[i][j] != ' ') {
+					int k = i + 1;
+					while (k < m && board[k][j] == ' ') k++;
+					board[k - 1][j] = board[i][j];
+					if (i != k - 1) board[i][j] = ' ';
 				}
 			}
 		}
 	}
 
-	cout << count << endl;
-	return count;
-}
+	cout << nBreaks << endl;
 
+	return 0;
+}
 
 int main() {
 	friends4block();
