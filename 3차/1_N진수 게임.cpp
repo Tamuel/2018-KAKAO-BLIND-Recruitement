@@ -38,10 +38,3 @@ int main() {
 
 	return 0;
 }
-
-
-int main() {
-	n_factor();
-
-	return 0;
-}
